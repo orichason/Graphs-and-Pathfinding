@@ -37,6 +37,7 @@ namespace GraphTest
 
             VerifyPath<char>(graph, startVertex, endVertex);
         }
+        //TO DO: CREATE A FUNCTION THAT CHECKS FOR NON RANDOM DFS INPUT
         /// <summary>
         /// Verifies a depth first search
         /// </summary>
