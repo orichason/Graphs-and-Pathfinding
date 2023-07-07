@@ -9,6 +9,12 @@ namespace GraphTest
     [TestClass]
     public class DFS
     {
+        /// <summary>
+        /// Checks for DFS with random input
+        /// </summary>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <param name="graphSize"></param>
         [TestMethod]
         [DataRow(97/*a*/, 122/*z*/, 20)]
         public void RandomDFS(int min, int max, int graphSize)
@@ -38,6 +44,15 @@ namespace GraphTest
             VerifyPath<char>(graph, startVertex, endVertex);
         }
         //TO DO: CREATE A FUNCTION THAT CHECKS FOR NON RANDOM DFS INPUT
+
+        [TestMethod]
+        [DataRow(0, 6)]
+        public void ManualDFS(int startIndex, int endIndex)
+        {
+            var graph = CreateExampleCharGraph();
+
+            VerifyPath<char>(graph, graph.Vertices[startIndex], graph.Vertices[endIndex]);
+        }
         /// <summary>
         /// Verifies a depth first search
         /// </summary>
@@ -55,6 +70,15 @@ namespace GraphTest
 
                 Assert.IsFalse(foundVertices.Contains(endVertex));
             }
+
+            //makes sure founders are correct in list
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (i != list.Count - 1)
+                {
+                    Assert.IsTrue(list[i].founder == list[i + 1]);
+                }
+            }
         }
 
         /// <summary>
@@ -67,7 +91,6 @@ namespace GraphTest
         {
             HashSet<Vertex<T>> foundVertices = new() { start };
 
-            //gets all vertices connected to start
             GetVertices(foundVertices, start);
             return foundVertices;
         }
@@ -80,6 +103,40 @@ namespace GraphTest
                 verts.Add(edge.EndingPoint);
                 GetVertices(verts, edge.EndingPoint);
             }
+        }
+
+        static Graph<char> CreateExampleCharGraph()
+        {
+            Graph<char> graph = new Graph<char>();
+
+            var a = new Vertex<char>('A');
+            var b = new Vertex<char>('B');
+            var d = new Vertex<char>('D');
+            var e = new Vertex<char>('E');
+            var f = new Vertex<char>('F');
+            var g = new Vertex<char>('G');
+            var h = new Vertex<char>('H');
+
+
+            graph.AddVertex(a);
+            graph.AddVertex(b);
+            graph.AddVertex(d);
+            graph.AddVertex(e);
+            graph.AddVertex(f);
+            graph.AddVertex(g);
+            graph.AddVertex(h);
+
+
+
+            graph.AddEdge(a, b, 1);
+            graph.AddEdge(a, e, 1);
+            graph.AddEdge(e, a, 1);
+            graph.AddEdge(b, d, 1);
+            graph.AddEdge(b, f, 1);
+            graph.AddEdge(b, g, 1);
+            graph.AddEdge(g, h, 1);
+
+            return graph;
         }
     }
 }
