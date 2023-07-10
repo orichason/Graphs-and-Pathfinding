@@ -35,14 +35,14 @@ namespace Graphs
             graph.AddEdge(b, g, 1);
             graph.AddEdge(g, h, 1);
 
-            var DFSList = graph.DepthFirstSearch(a, h);
+            var DFSList = graph.DepthFirstSearch(a, g);
 
             for (int i = DFSList.Count - 1; i >= 0; i--)
                 Console.Write(DFSList[i]);
 
             Console.WriteLine();
 
-            var BFSList = graph.BredthFirstSearch(a, h);
+            var BFSList = graph.BredthFirstSearch(a, g);
             for (int i = BFSList.Count - 1; i >= 0; i--)
                 Console.Write(BFSList[i]);
         }

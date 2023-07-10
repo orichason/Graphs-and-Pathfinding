@@ -43,13 +43,17 @@ namespace GraphTest
 
             VerifyPath<char>(graph, startVertex, endVertex);
         }
-        //TO DO: CREATE A FUNCTION THAT CHECKS FOR NON RANDOM DFS INPUT
 
+        /// <summary>
+        /// Checks with manual input
+        /// </summary>
+        /// <param name="startIndex"></param>
+        /// <param name="endIndex"></param>
         [TestMethod]
         [DataRow(0, 6)]
         public void ManualDFS(int startIndex, int endIndex)
         {
-            var graph = CreateExampleCharGraph();
+            var graph = ExampleGraph();
 
             VerifyPath<char>(graph, graph.Vertices[startIndex], graph.Vertices[endIndex]);
         }
@@ -71,12 +75,15 @@ namespace GraphTest
                 Assert.IsFalse(foundVertices.Contains(endVertex));
             }
 
-            //makes sure founders are correct in list
-            for (int i = 0; i < list.Count; i++)
+            else
             {
-                if (i != list.Count - 1)
+                //makes sure founders are correct in list
+                for (int i = 0; i < list.Count; i++)
                 {
-                    Assert.IsTrue(list[i].founder == list[i + 1]);
+                    if (i != list.Count - 1)
+                    {
+                        Assert.IsTrue(list[i].founder == list[i + 1]);
+                    }
                 }
             }
         }
@@ -104,8 +111,11 @@ namespace GraphTest
                 GetVertices(verts, edge.EndingPoint);
             }
         }
-
-        static Graph<char> CreateExampleCharGraph()
+        /// <summary>
+        /// Creates example char graph for testing
+        /// </summary>
+        /// <returns></returns>
+        static Graph<char> ExampleGraph()
         {
             Graph<char> graph = new Graph<char>();
 
