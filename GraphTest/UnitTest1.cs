@@ -157,13 +157,21 @@ namespace GraphTest
     [TestClass]
     public class BFS
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="columns"></param>
+        /// <param name="seed"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns> graph with random vertices and edges</returns>
         static Graph<char> SampleGraph(int columns, int seed, out Vertex<char> start, out Vertex<char> end)
         {
             Graph<char> graph = new();
 
             Random random = new(seed);
 
-            int rows = 0;
+            int rows;
 
             Vertex<char>[][] jaggedArray = new Vertex<char>[columns][];
 
@@ -207,7 +215,7 @@ namespace GraphTest
             var path = graph.DepthFirstSearch(start, end);
             ;
 
-            //see why taking so much ram when running
+            //see why taking so much ram when running(possibly because of duplicates)
             //make a first and last node with one row in a column
         }
 

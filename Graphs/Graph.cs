@@ -101,7 +101,7 @@ namespace Graphs
         {
             if (a == null || b == null) return false;
 
-            if (vertices.Contains(a) && vertices.Contains(a) && ContainsEdge(a, b) == null)
+            if (a != b && vertices.Contains(a) && vertices.Contains(b) && ContainsEdge(a, b) == null)
             {
                 a.Neighbors.Add(new Edge<T>(a, b, distance));
                 b.founder = a;

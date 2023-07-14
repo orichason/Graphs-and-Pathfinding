@@ -19,5 +19,10 @@ namespace Graphs
             EndingPoint = endingPoint;
             Distance = distance;
         }
+
+        public override string ToString()
+        {
+            return EndingPoint.ToString();
+        }
     }
 }
