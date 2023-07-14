@@ -4,6 +4,10 @@ using System.Reflection;
 
 using Graphs;
 
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using static System.Math;
+
 namespace GraphTest
 {
     [TestClass]
@@ -148,5 +152,64 @@ namespace GraphTest
 
             return graph;
         }
+    }
+
+    [TestClass]
+    public class BFS
+    {
+        static Graph<char> SampleGraph(int columns, int seed, out Vertex<char> start, out Vertex<char> end)
+        {
+            Graph<char> graph = new();
+
+            Random random = new(seed);
+
+            int rows = 0;
+
+            Vertex<char>[][] jaggedArray = new Vertex<char>[columns][];
+
+            for (int i = 0; i < columns; i++)
+            {
+                rows = random.Next(2, 5);
+                jaggedArray[i] = new Vertex<char>[rows];
+                for (int j = 0; j < rows; j++)
+                {
+                    graph.AddVertex(jaggedArray[i][j] = new Vertex<char>((char)random.Next(97, 123)));
+                }
+            }
+
+            for (int i = 0; i < columns; i++)
+            {
+                for (int j = 0; j < jaggedArray[i].Length; j++)
+                {
+                    int columnMin = Max(i - 1, 0);
+                    int columnMax = Min(columns, i + 2);
+                    
+                    int neighborCount = random.Next(3, 9);
+                    for (int k = 0; k < neighborCount; k++)
+                    {
+                        int randomColumn = random.Next(columnMin, columnMax); //getting random column
+
+                        graph.AddEdge(jaggedArray[i][j], jaggedArray[randomColumn][random.Next(0, jaggedArray[randomColumn].Length)], random.Next(1, 10));
+
+                    }
+                }
+            }
+
+            start = jaggedArray[0][0];
+            end = jaggedArray[^1][0]; // ^1 = length - 1;
+            return graph;
+        }
+
+        [TestMethod]
+        public void RandomBFS()
+        {
+            var graph = SampleGraph(8, 1, out var start, out var end);
+            var path = graph.DepthFirstSearch(start, end);
+            ;
+
+            //see why taking so much ram when running
+            //make a first and last node with one row in a column
+        }
+
     }
 }
