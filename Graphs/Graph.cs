@@ -1,5 +1,8 @@
-﻿using System;
+﻿using HeapTree;
+
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.SymbolStore;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
@@ -143,7 +146,7 @@ namespace Graphs
             //set all vertices isVisited to false
             for (int i = 0; i < Vertices.Count; i++)
                 vertices[i].isVisited = false;
-            
+
             var vertexStack = new Stack<Vertex<T>>();
 
             var current = startingVertex;
@@ -155,7 +158,7 @@ namespace Graphs
                 current = vertexStack.Pop();
 
                 //if reached the ending vertex
-                if(current == endingVertex)
+                if (current == endingVertex)
                 {
                     list.Add(current);
                     //go backwards starting from endingVertex
@@ -193,13 +196,14 @@ namespace Graphs
             var list = new List<Vertex<T>>();
             var vertexQueue = new Queue<Vertex<T>>();
 
-            for(int i = 0; i < Vertices.Count; i++)
+            for (int i = 0; i < Vertices.Count; i++)
                 Vertices[i].isVisited = false;
 
             var current = startingVertex;
+            current.isVisited = true;
 
             vertexQueue.Enqueue(current);
-            
+
             do
             {
                 current = vertexQueue.Dequeue();
@@ -215,21 +219,74 @@ namespace Graphs
                     return list;
                 }
 
-                for(int i = 0; i < current.NeighborCount; i++)
+                for (int i = 0; i < current.NeighborCount; i++)
                 {
                     if (!current.Neighbors[i].EndingPoint.isVisited)
                     {
                         vertexQueue.Enqueue(current.Neighbors[i].EndingPoint);
                         current.Neighbors[i].EndingPoint.founder = current;
+                        current.Neighbors[i].EndingPoint.isVisited = true;
                     }
                 }
-
-                current.isVisited = true;
-
             } while (vertexQueue.Count > 0);
 
             return null;
         }
+
+        public List<Vertex<T>> Dijkstra(Vertex<T> startVertex, Vertex<T> endVertex)
+        {
+            MinHeap<Vertex<T>> queue = new();
+
+            for (int i = 0; i < vertices.Count; i++)
+            {
+                vertices[i].isVisited = false;
+                vertices[i].DistanceFromStart = float.PositiveInfinity;
+                vertices[i].founder = null;
+            }
+
+            startVertex.DistanceFromStart = 0;
+            queue.Insert(startVertex);
+
+            Vertex<T> currentVertex;
+
+            do
+            {
+                currentVertex = queue.Pop();
+
+                if (currentVertex.isVisited) continue;
+
+                for (int i = 0; i < currentVertex.NeighborCount; i++)
+                {
+                    float tentativeDistance = currentVertex.Neighbors[i].Distance + currentVertex.DistanceFromStart;
+
+                    if (tentativeDistance < currentVertex.Neighbors[i].EndingPoint.DistanceFromStart)
+                    {
+                        currentVertex.Neighbors[i].EndingPoint.DistanceFromStart = tentativeDistance;
+                        currentVertex.Neighbors[i].EndingPoint.founder = currentVertex;
+                    }
+
+                    if (!currentVertex.Neighbors[i].EndingPoint.isVisited)
+                    {
+                        queue.Insert(currentVertex.Neighbors[i].EndingPoint);
+                    }
+                }
+                currentVertex.isVisited = true;
+
+            } while (queue.Count > 0);
+
+            List<Vertex<T>> path = new();
+
+            currentVertex = endVertex;
+
+            while (currentVertex != startVertex)
+            {
+                path.Add(currentVertex);
+                currentVertex = currentVertex.founder;
+            }
+
+            path.Add(currentVertex);
+
+            return path;
+        }
     }
 }
-

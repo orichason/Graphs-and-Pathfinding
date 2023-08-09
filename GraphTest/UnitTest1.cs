@@ -168,8 +168,24 @@ namespace GraphTest
         static Graph<char> SampleGraph(int columns, int seed, out Vertex<char> start, out Vertex<char> end)
         {
             Graph<char> graph = new();
-
+            
             Random random = new(seed);
+           
+            start = new('a');
+            Vertex<char> path = new('b');
+            end = new('c');
+            graph.AddVertex(start);
+            graph.AddVertex(path);
+            graph.AddVertex(end);
+            
+            if(columns == 0)
+            {
+                graph.AddEdge(start, end, random.Next(1,10));
+                graph.AddEdge(start, path, random.Next(1, 10));
+                graph.AddEdge(path, end, random.Next(1, 10));
+
+                return graph;
+            }
 
             int rows;
 
@@ -203,20 +219,127 @@ namespace GraphTest
                 }
             }
 
-            start = jaggedArray[0][0];
-            end = jaggedArray[^1][0]; // ^1 = length - 1;
+            for (int i = 0; i < jaggedArray[0].Length - 1; i++)
+            {
+                graph.AddEdge(start, jaggedArray[0][i], random.Next(1,10));
+            }
+            graph.AddEdge(start, path, random.Next(1, 10));
+            graph.AddEdge(path, end, random.Next(1, 10));
+            for (int i = 0; i < jaggedArray[jaggedArray.Length - 1].Length; i++)
+            {
+                graph.AddEdge(jaggedArray[jaggedArray.Length - 1][i], end, random.Next(1, 10));
+            }
             return graph;
         }
+        /// <summary>
+        /// Verifying that path is max 3 vertices long
+        /// </summary>
+        /// <param name="column"></param>
 
         [TestMethod]
-        public void RandomBFS()
+        [DataRow(3)]
+        [DataRow(0)]
+        [DataRow(10)]
+        [DataRow(2)]
+        public void RandomBFS(int column)
         {
-            var graph = SampleGraph(8, 1, out var start, out var end);
-            var path = graph.DepthFirstSearch(start, end);
-            ;
+            var graph = SampleGraph(column, 1, out var start, out var end);
+            var path = graph.BredthFirstSearch(start, end);
 
-            //see why taking so much ram when running(possibly because of duplicates)
-            //make a first and last node with one row in a column
+            Assert.IsTrue(path.Count <= (column == 0? 2 : 3));            
+        }
+
+    }
+
+    [TestClass]
+    public class Pathfinding
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="columns"></param>
+        /// <param name="seed"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns> graph with random vertices and edges</returns>
+        static Graph<char> SampleGraph(int columns, int seed, out Vertex<char> start, out Vertex<char> end)
+        {
+            Graph<char> graph = new();
+
+            Random random = new(seed);
+
+            start = new('a');
+            Vertex<char> path = new('b');
+            end = new('c');
+            graph.AddVertex(start);
+            graph.AddVertex(path);
+            graph.AddVertex(end);
+
+            if (columns == 0)
+            {
+                graph.AddEdge(start, end, 100000);
+                graph.AddEdge(start, path, 100000);
+                graph.AddEdge(path, end, 100000);
+
+                return graph;
+            }
+
+            int rows;
+
+            Vertex<char>[][] jaggedArray = new Vertex<char>[columns][];
+
+            for (int i = 0; i < columns; i++)
+            {
+                rows = random.Next(2, 5);
+                jaggedArray[i] = new Vertex<char>[rows];
+                for (int j = 0; j < rows; j++)
+                {
+                    graph.AddVertex(jaggedArray[i][j] = new Vertex<char>((char)random.Next(97, 123)));
+                }
+            }
+
+            for (int i = 0; i < columns; i++)
+            {
+                for (int j = 0; j < jaggedArray[i].Length; j++)
+                {
+                    int columnMin = Max(i - 1, 0);
+                    int columnMax = Min(columns, i + 2);
+
+                    int neighborCount = random.Next(3, 9);
+                    for (int k = 0; k < neighborCount; k++)
+                    {
+                        int randomColumn = random.Next(columnMin, columnMax); //getting random column
+
+                        graph.AddEdge(jaggedArray[i][j], jaggedArray[randomColumn][random.Next(0, jaggedArray[randomColumn].Length)], random.Next(1, 10));
+
+                    }
+                }
+            }
+
+            for (int i = 0; i < jaggedArray[0].Length - 1; i++)
+            {
+                graph.AddEdge(start, jaggedArray[0][i], random.Next(1, 10));
+            }
+            graph.AddEdge(start, path, 1);
+            graph.AddEdge(path, end, 1);
+            for (int i = 0; i < jaggedArray[jaggedArray.Length - 1].Length; i++)
+            {
+                graph.AddEdge(jaggedArray[jaggedArray.Length - 1][i], end, random.Next(1, 10));
+            }
+            return graph;
+        }
+        [TestMethod]
+        [DataRow(4)]
+        [DataRow(1)]
+        [DataRow(10)]
+        [DataRow(20)]
+        [DataRow(0)]
+        public void Dijkstra(int column)
+        {
+            var graph = SampleGraph(column, 1, out var start, out var end);
+            var path = graph.Dijkstra(start, end);
+
+            Assert.IsTrue(path.Count <= (column == 0 ? 2 : 3));
         }
 
     }
