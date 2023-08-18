@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Numerics;
 using System.Reflection;
 
 using Graphs;
@@ -340,6 +341,29 @@ namespace GraphTest
             var path = graph.Dijkstra(start, end);
 
             Assert.IsTrue(path.Count <= (column == 0 ? 2 : 3));
+        }
+
+        [TestMethod]
+        [DataRow(5, 5, 1, 0.3)]
+        public /*Graph<Vector2>*/ void BestFirstSearchGraph(int columns, int rows, int seed,float holePercentage)
+        {
+            Random random = new();
+
+            Graph<Vector2> graph = new();
+
+            Vector2[,] vectors = new Vector2[columns, rows];
+
+            float numOfHoles = (float)(vectors.Length * holePercentage);
+
+            for (int i = 0; i < columns; i++)
+            {
+                for (int j = 0; j < rows; j++)
+                {
+                    vectors[i,j] = new Vector2(i, j);
+                }
+            }
+
+            return /*graph*/;
         }
 
     }

@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Graphs
 {
-    public class Vertex<T> : IComparable<Vertex<T>>
+    public class Vertex<T>
     {
         public float DistanceFromStart;
+
+        public float DistanceFromEnd;
         public T Value { get; set; }
         public List<Edge<T>> Neighbors { get; set; }
 
@@ -27,15 +31,6 @@ namespace Graphs
         public override string ToString()
         {
             return Value.ToString();
-        }
-
-        public int CompareTo(Vertex<T>? other)
-        {
-            if (DistanceFromStart < other.DistanceFromStart) return -1;
-
-            else if (DistanceFromStart > other.DistanceFromStart) return 1;
-
-            else return 0;
         }
 
     }

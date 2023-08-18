@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.SymbolStore;
 using System.Linq;
+using System.Numerics;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
@@ -235,7 +236,7 @@ namespace Graphs
 
         public List<Vertex<T>> Dijkstra(Vertex<T> startVertex, Vertex<T> endVertex)
         {
-            MinHeap<Vertex<T>> queue = new();
+            MinHeap<Vertex<T>> priorityQueue = new(new DijkstraComparer<T>());
 
             for (int i = 0; i < vertices.Count; i++)
             {
@@ -245,13 +246,13 @@ namespace Graphs
             }
 
             startVertex.DistanceFromStart = 0;
-            queue.Insert(startVertex);
+            priorityQueue.Insert(startVertex);
 
             Vertex<T> currentVertex;
 
             do
             {
-                currentVertex = queue.Pop();
+                currentVertex = priorityQueue.Pop();
 
                 if (currentVertex.isVisited) continue;
 
@@ -267,12 +268,12 @@ namespace Graphs
 
                     if (!currentVertex.Neighbors[i].EndingPoint.isVisited)
                     {
-                        queue.Insert(currentVertex.Neighbors[i].EndingPoint);
+                        priorityQueue.Insert(currentVertex.Neighbors[i].EndingPoint);
                     }
                 }
                 currentVertex.isVisited = true;
 
-            } while (queue.Count > 0);
+            } while (priorityQueue.Count > 0);
 
             List<Vertex<T>> path = new();
 
@@ -288,5 +289,7 @@ namespace Graphs
 
             return path;
         }
+
+        public static void DoStuff() { }
     }
 }

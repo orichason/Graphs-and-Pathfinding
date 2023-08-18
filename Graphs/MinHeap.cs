@@ -1,15 +1,19 @@
 ﻿using System;
+using System.Collections;
+
 namespace HeapTree
 {
-    public class MinHeap<T> where T : IComparable<T>
+    public class MinHeap<T>
     {
         public int Count { get; private set; }
         private T[] data;
 
-        public MinHeap()
+        private IComparer<T> comparer;
+        public MinHeap(IComparer<T> comparer)
         {
             Count = 0;
             data = new T[4];
+            this.comparer = comparer;
         }
 
         private bool IsEmpty()
@@ -57,16 +61,14 @@ namespace HeapTree
 
         internal void HeapifyUp(int index)
         {
-
             int parentIndex = Parent(index);
 
-            if (data[index].CompareTo(data[parentIndex]) < 0)
+            if (comparer.Compare(data[index], data[parentIndex]) < 0)
             {
                 T temp = data[parentIndex];
                 data[parentIndex] = data[index];
                 data[index] = temp;
                 HeapifyUp(parentIndex);
-
             }
 
             return;
@@ -94,7 +96,7 @@ namespace HeapTree
             int rightChild = RightChildIndex(index);
             int smallestChild;
 
-            if (data[leftChild].CompareTo(data[rightChild]) < 0)
+            if (comparer.Compare(data[leftChild], data[rightChild]) < 0)
             {
                 smallestChild = leftChild;               
             }
@@ -104,7 +106,7 @@ namespace HeapTree
                 smallestChild = rightChild;
             }
 
-            if (data[index].CompareTo(data[smallestChild]) > 0)
+            if (comparer.Compare(data[index], data[smallestChild]) > 0)
             {
                 T temp = data[index];
                 data[index] = data[smallestChild];
