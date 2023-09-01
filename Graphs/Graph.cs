@@ -140,6 +140,13 @@ namespace Graphs
             return null;
         }
 
+
+        public bool PathExists(Vertex<T> startVertex, Vertex<T> endVertex)
+        {
+            List<Vertex<T>> path = DepthFirstSearch(startVertex, endVertex);
+
+            return path != null;
+        }
         public List<Vertex<T>>? DepthFirstSearch(Vertex<T> startingVertex, Vertex<T> endingVertex)
         {
             var list = new List<Vertex<T>>();

@@ -14,6 +14,9 @@ namespace Graphs
         public float DistanceFromStart;
 
         public float DistanceFromEnd;
+
+        public float FinalDistance;
+
         public T Value { get; set; }
         public List<Edge<T>> Neighbors { get; set; }
 

@@ -5,7 +5,10 @@ using System.Reflection;
 
 using Graphs;
 
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using NuGet.Frameworks;
 
 using static System.Math;
 
@@ -169,19 +172,19 @@ namespace GraphTest
         static Graph<char> SampleGraph(int columns, int seed, out Vertex<char> start, out Vertex<char> end)
         {
             Graph<char> graph = new();
-            
+
             Random random = new(seed);
-           
+
             start = new('a');
             Vertex<char> path = new('b');
             end = new('c');
             graph.AddVertex(start);
             graph.AddVertex(path);
             graph.AddVertex(end);
-            
-            if(columns == 0)
+
+            if (columns == 0)
             {
-                graph.AddEdge(start, end, random.Next(1,10));
+                graph.AddEdge(start, end, random.Next(1, 10));
                 graph.AddEdge(start, path, random.Next(1, 10));
                 graph.AddEdge(path, end, random.Next(1, 10));
 
@@ -208,7 +211,7 @@ namespace GraphTest
                 {
                     int columnMin = Max(i - 1, 0);
                     int columnMax = Min(columns, i + 2);
-                    
+
                     int neighborCount = random.Next(3, 9);
                     for (int k = 0; k < neighborCount; k++)
                     {
@@ -222,7 +225,7 @@ namespace GraphTest
 
             for (int i = 0; i < jaggedArray[0].Length - 1; i++)
             {
-                graph.AddEdge(start, jaggedArray[0][i], random.Next(1,10));
+                graph.AddEdge(start, jaggedArray[0][i], random.Next(1, 10));
             }
             graph.AddEdge(start, path, random.Next(1, 10));
             graph.AddEdge(path, end, random.Next(1, 10));
@@ -247,7 +250,7 @@ namespace GraphTest
             var graph = SampleGraph(column, 1, out var start, out var end);
             var path = graph.BredthFirstSearch(start, end);
 
-            Assert.IsTrue(path.Count <= (column == 0? 2 : 3));            
+            Assert.IsTrue(path.Count <= (column == 0 ? 2 : 3));
         }
 
     }
@@ -329,6 +332,7 @@ namespace GraphTest
             }
             return graph;
         }
+
         [TestMethod]
         [DataRow(4)]
         [DataRow(1)]
@@ -343,28 +347,82 @@ namespace GraphTest
             Assert.IsTrue(path.Count <= (column == 0 ? 2 : 3));
         }
 
-        [TestMethod]
-        [DataRow(5, 5, 1, 0.3)]
-        public /*Graph<Vector2>*/ void BestFirstSearchGraph(int columns, int rows, int seed,float holePercentage)
+        public Graph<Vector2> BestFirstSearchSampleGraph(int columns, int rows, Random random, float holePercentage, out Vertex<Vector2> start, out Vertex<Vector2> end)
         {
-            Random random = new();
-
             Graph<Vector2> graph = new();
 
-            Vector2[,] vectors = new Vector2[columns, rows];
+            Vertex<Vector2>[,] vertices = new Vertex<Vector2>[columns, rows];
 
-            float numOfHoles = (float)(vectors.Length * holePercentage);
+            int numOfHoles = (int)(vertices.Length * holePercentage);
+
+            int[,] randomHoles = new int[columns, rows];
+
+            for (int i = 0; i < numOfHoles - 1; i++)
+            {
+                randomHoles[random.Next(columns), random.Next(rows)] = 1;
+            }
+
+            for (int i = 0; i < columns; i++)
+            {
+
+                for (int j = 0; j < rows; j++)
+                {
+                    if (randomHoles[i, j] == 1) continue;
+
+                    vertices[i, j] = new Vertex<Vector2>(new Vector2(i, j));
+                    graph.AddVertex(vertices[i, j]);
+                }
+            }
 
             for (int i = 0; i < columns; i++)
             {
                 for (int j = 0; j < rows; j++)
                 {
-                    vectors[i,j] = new Vector2(i, j);
+                    if (vertices[i, j] == null) continue;
+
+                    int numOfEdges = random.Next(rows);
+                    int temp = 0;
+                    while (temp < numOfEdges)
+                    {
+                        temp++;
+                        int randomColumn = random.Next(columns);
+                        int randomRow = random.Next(rows);
+                        if (vertices[randomColumn, randomRow] == null) continue;
+                        graph.AddEdge(vertices[i, j], vertices[randomColumn, randomRow], Vector2.Distance(vertices[i, j].Value, vertices[randomColumn, randomRow].Value));
+                    }
                 }
             }
 
-            return /*graph*/;
+            while (true)
+            {
+                int startIndex = random.Next(columns);
+                int endIndex = random.Next(rows);
+                if (graph.PathExists(graph.Vertices[startIndex], graph.Vertices[endIndex]))
+                {
+                    start = graph.Vertices[startIndex];
+                    end = graph.Vertices[endIndex];
+                    break;
+                }
+            }
+
+            return graph;
         }
 
+        [TestMethod]
+        [DataRow(5, 5, 3, 0.3f)]
+        [DataRow(10, 7, 2, 0.1f)]
+        //[DataRow(0, 0, 1, 0.9f)]
+        [DataRow(20, 20, 5, 0.7f)]
+        [DataRow(1, 3, 1, 0.1f)]
+
+        public void BestFirstSearch(int columns, int rows, int seed, float holePercentage)
+        {
+            Random random = new(seed);
+            Graph<Vector2> graph = BestFirstSearchSampleGraph(columns, rows, random, holePercentage, out var start, out var end);
+
+            List<Vertex<Vector2>> path = graph.BestFirstSearch(start, end);
+
+            Assert.IsFalse(path[0] != end || path[path.Count - 1] != start);
+        }
     }
 }
