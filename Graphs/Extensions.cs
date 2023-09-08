@@ -72,18 +72,21 @@ namespace Graphs
         public static List<Vertex<Vector2>> AStar(this Graph<Vector2> graph, Vertex<Vector2> startVertex, Vertex<Vector2> endVertex)
         {
             MinHeap<Vertex<Vector2>> priorityQueue = new MinHeap<Vertex<Vector2>>(new AStarComparer());
+
             for (int i = 0; i < graph.VertexCount; i++)
             {
                 graph.Vertices[i].DistanceFromStart = float.PositiveInfinity;
                 graph.Vertices[i].DistanceFromEnd = float.PositiveInfinity;
                 graph.Vertices[i].FinalDistance = graph.Vertices[i].DistanceFromStart + graph.Vertices[i].DistanceFromEnd;
                 graph.Vertices[i].founder = null;
+                graph.Vertices[i].isVisited = false;
             }
 
             startVertex.DistanceFromStart = 0;
+            startVertex.DistanceFromEnd = startVertex.Distance(endVertex);
             priorityQueue.Insert(startVertex);
 
-            Vertex<Vector2> currentVertex = startVertex;
+            Vertex<Vector2> currentVertex;
             do
             {
                 currentVertex = priorityQueue.Pop();
@@ -92,20 +95,41 @@ namespace Graphs
 
                 currentVertex.isVisited = true;
 
-                if(currentVertex == endVertex)
+                if(endVertex.isVisited)
                 {
-                    //do path here
+                    List<Vertex<Vector2>> path = new();
+
+                    while (currentVertex != startVertex)
+                    {
+                        path.Add(currentVertex);
+                        currentVertex = currentVertex.founder;
+                    }
+
+                    path.Add(currentVertex);
+
+                    return path;
                 }
 
                 for (int i = 0; i < currentVertex.NeighborCount; i++)
                 {
-                    if (!currentVertex.Neighbors[i].EndingPoint.isVisited)
+                    Vertex<Vector2> neighbor = currentVertex.Neighbors[i].EndingPoint;
+                    float tentativeDistance = currentVertex.DistanceFromStart + currentVertex.Neighbors[i].Distance;
+
+                    if (tentativeDistance < neighbor.DistanceFromStart)
                     {
-                        //do stuff
+                        neighbor.DistanceFromStart = tentativeDistance;
+                        neighbor.founder = currentVertex;
+                        neighbor.FinalDistance = neighbor.DistanceFromStart + neighbor.Distance(endVertex);
+                    }
+
+                    if (!neighbor.isVisited)
+                    {
+                        priorityQueue.Insert(neighbor);
                     }
                 }
-
             } while (priorityQueue.Count > 0);
+
+            throw new ArgumentException("Can't find a path");
         }
     }
 }

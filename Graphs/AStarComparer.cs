@@ -11,9 +11,9 @@ namespace Graphs
     {
         public int Compare(Vertex<Vector2>? vertex, Vertex<Vector2>? goal)
         {
-            if ((vertex.DistanceFromStart + vertex.DistanceFromEnd) < (goal.DistanceFromStart + goal.DistanceFromEnd)) return -1;
+            if (vertex.FinalDistance < goal.FinalDistance) return -1;
 
-            else if ((vertex.DistanceFromStart + vertex.DistanceFromEnd) > (goal.DistanceFromStart + goal.DistanceFromEnd)) return 1;
+            else if (vertex.FinalDistance > goal.FinalDistance) return 1;
 
             else return 0;
         }

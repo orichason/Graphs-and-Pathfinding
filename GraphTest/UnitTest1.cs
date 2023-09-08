@@ -265,7 +265,7 @@ namespace GraphTest
         /// <param name="seed"></param>
         /// <param name="start"></param>
         /// <param name="end"></param>
-        /// <returns> graph with random vertices and edges</returns>
+        /// <returns> graph with random vertices and edges and a guaranteed best path (a=>b=>c)</returns>
         static Graph<char> SampleGraph(int columns, int seed, out Vertex<char> start, out Vertex<char> end)
         {
             Graph<char> graph = new();
@@ -347,7 +347,17 @@ namespace GraphTest
             Assert.IsTrue(path.Count <= (column == 0 ? 2 : 3));
         }
 
-        public Graph<Vector2> BestFirstSearchSampleGraph(int columns, int rows, Random random, float holePercentage, out Vertex<Vector2> start, out Vertex<Vector2> end)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="columns"></param>
+        /// <param name="rows"></param>
+        /// <param name="random"></param>
+        /// <param name="holePercentage"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns> Graph with holes, random number of edges, and random weights </returns>
+        public Graph<Vector2> SampleGraph(int columns, int rows, Random random, float holePercentage, out Vertex<Vector2> start, out Vertex<Vector2> end)
         {
             Graph<Vector2> graph = new();
 
@@ -364,7 +374,6 @@ namespace GraphTest
 
             for (int i = 0; i < columns; i++)
             {
-
                 for (int j = 0; j < rows; j++)
                 {
                     if (randomHoles[i, j] == 1) continue;
@@ -395,8 +404,8 @@ namespace GraphTest
 
             while (true)
             {
-                int startIndex = random.Next(columns);
-                int endIndex = random.Next(rows);
+                int startIndex = random.Next(graph.VertexCount);
+                int endIndex = random.Next(graph.VertexCount);
                 if (graph.PathExists(graph.Vertices[startIndex], graph.Vertices[endIndex]))
                 {
                     start = graph.Vertices[startIndex];
@@ -418,11 +427,42 @@ namespace GraphTest
         public void BestFirstSearch(int columns, int rows, int seed, float holePercentage)
         {
             Random random = new(seed);
-            Graph<Vector2> graph = BestFirstSearchSampleGraph(columns, rows, random, holePercentage, out var start, out var end);
+            Graph<Vector2> graph = SampleGraph(columns, rows, random, holePercentage, out var start, out var end);
 
             List<Vertex<Vector2>> path = graph.BestFirstSearch(start, end);
 
             Assert.IsFalse(path[0] != end || path[path.Count - 1] != start);
+        }
+
+        [TestMethod]
+        [DataRow(5, 5, 3, 0.3f)]
+        [DataRow(10, 7, 2, 0.1f)]
+        [DataRow(20, 20, 5, 0.7f)]
+        [DataRow(12, 2, 9, 0.1f)]
+        [DataRow(16, 8, 23, 0.8f)]
+        [DataRow(1, 9, 4, 0.9f)]
+        [DataRow(8, 22, 11, 0.14f)]
+        [DataRow(24, 12, 20, 0.19f)]
+
+        public void AStar(int columns, int rows, int seed, float holePercentage)
+        {
+            Random random = new(seed);
+            Graph<Vector2> graph = SampleGraph(columns, rows, random, holePercentage, out var start, out var end);
+            var dijkstraPath = graph.Dijkstra(start, end);
+            var aStarPath = graph.AStar(start, end);
+
+            float dijkstraPathLength = 0;
+            for (int i = 0; i < dijkstraPath.Count; i++)
+            {
+                dijkstraPathLength += dijkstraPath[i].DistanceFromStart;
+            }
+
+            float aStarPathLength = 0;
+            for (int i = 0; i < aStarPath.Count; i++)
+            {
+                aStarPathLength += aStarPath[i].DistanceFromStart;
+            }
+            Assert.IsTrue(dijkstraPathLength == aStarPathLength);
         }
     }
 }
