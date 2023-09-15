@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace Graphs
+namespace Graphs.Comparers
 {
     public class BestFirstComparer : IComparer<Vertex<Vector2>>
     {

@@ -1,4 +1,4 @@
-﻿namespace Graphs
+﻿namespace Graphs.Comparers
 {
 #nullable disable
     public class DijkstraComparer<T> : IComparer<Vertex<T>>

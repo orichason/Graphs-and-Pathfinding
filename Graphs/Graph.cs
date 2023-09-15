@@ -1,4 +1,6 @@
-﻿using HeapTree;
+﻿using Graphs.Comparers;
+
+using HeapTree;
 
 using System;
 using System.Collections.Generic;
@@ -79,7 +81,6 @@ namespace Graphs
 
             for (int i = 0; i < vertex.NeighborCount; i++)
             {
-                //ertex.Neighbors[i].Neighbors.Remove(vertex);
                 vertex.Neighbors.Remove(vertex.Neighbors[i]);
             }
 
@@ -297,6 +298,66 @@ namespace Graphs
             return path;
         }
 
-        public static void DoStuff() { }
+        private void Dijkstra(Vertex<T> startVertex)
+        {
+            MinHeap<Vertex<T>> priorityQueue = new(new DijkstraComparer<T>());
+
+            for (int i = 0; i < vertices.Count; i++)
+            {
+                vertices[i].isVisited = false;
+                vertices[i].DistanceFromStart = float.PositiveInfinity;
+                vertices[i].founder = null;
+            }
+
+            startVertex.DistanceFromStart = 0;
+            priorityQueue.Insert(startVertex);
+
+            Vertex<T> currentVertex;
+
+            do
+            {
+                currentVertex = priorityQueue.Pop();
+
+                if (currentVertex.isVisited) continue;
+                
+                for (int i = 0; i < currentVertex.NeighborCount; i++)
+                {
+                    float tentativeDistance = currentVertex.Neighbors[i].Distance + currentVertex.DistanceFromStart;
+
+                    if (!currentVertex.Neighbors[i].EndingPoint.isVisited && tentativeDistance < currentVertex.Neighbors[i].EndingPoint.DistanceFromStart)
+                    {
+                        currentVertex.Neighbors[i].EndingPoint.DistanceFromStart = tentativeDistance;
+                        currentVertex.Neighbors[i].EndingPoint.founder = currentVertex;
+                    }
+
+                    if (!currentVertex.Neighbors[i].EndingPoint.isVisited)
+                    {
+                        priorityQueue.Insert(currentVertex.Neighbors[i].EndingPoint);
+                    }
+                }
+                currentVertex.isVisited = true;
+
+            } while (priorityQueue.Count > 0);
+        }
+
+        public bool BellmanFord(Vertex<T> startVertex)
+        {
+            Dijkstra(startVertex);
+
+            for (int i = 0; i < VertexCount; i++)
+            {
+                for (int j = 0; j < vertices[i].NeighborCount; j++)
+                {
+                    float tentativeDistance = vertices[i].Neighbors[j].Distance + vertices[i].DistanceFromStart;
+
+                    if (tentativeDistance < vertices[i].Neighbors[j].EndingPoint.DistanceFromStart)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
     }
 }

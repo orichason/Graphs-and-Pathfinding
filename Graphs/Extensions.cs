@@ -1,4 +1,6 @@
-﻿using HeapTree;
+﻿using Graphs.Comparers;
+
+using HeapTree;
 
 using System;
 using System.Collections.Generic;

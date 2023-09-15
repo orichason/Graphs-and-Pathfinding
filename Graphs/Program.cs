@@ -5,7 +5,7 @@ namespace Graphs
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static Graph<char> SampleGraph()
         {
             Graph<char> graph = new Graph<char>();
 
@@ -16,6 +16,7 @@ namespace Graphs
             var e = new Vertex<char>('E');
             var f = new Vertex<char>('F');
             var g = new Vertex<char>('G');
+            var j = new Vertex<char>('J');
             var h = new Vertex<char>('H');
 
 
@@ -26,32 +27,32 @@ namespace Graphs
             graph.AddVertex(e);
             graph.AddVertex(f);
             graph.AddVertex(g);
+            graph.AddVertex(j);
             graph.AddVertex(h);
 
 
 
-            graph.AddEdge(a, b, 10);
-            graph.AddEdge(a, c, 2);
-            graph.AddEdge(a, e, 50);
-            graph.AddEdge(b, e, 5);
-            graph.AddEdge(c, e, 20);
-            graph.AddEdge(d, f, 50);
-            graph.AddEdge(e, f, 3);
+            graph.AddEdge(a, b, 3);
+            graph.AddEdge(b, c, 10);
+            graph.AddEdge(c, d, -1);
+            graph.AddEdge(d, e, 5);
+            graph.AddEdge(e, c, -3);
+            //graph.AddEdge(c, a, -10);
+            graph.AddEdge(a, f, 3);
+            graph.AddEdge(f, g, 13);
+            graph.AddEdge(f, e, 2);
+            graph.AddEdge(j, h,-2);
 
-            //var DFSList = graph.DepthFirstSearch(a, g);
+            return graph;
 
-            //for (int i = DFSList.Count - 1; i >= 0; i--)
-            //    Console.Write(DFSList[i]);
+        }
+        static void Main(string[] args)
+        {
+            Graph<char> graph = SampleGraph();
 
-            //Console.WriteLine();
+            bool hello = graph.BellmanFord(graph.Vertices[0]);
 
-            //var BFSList = graph.BredthFirstSearch(a, g);
-            //for (int i = BFSList.Count - 1; i >= 0; i--)
-            //    Console.Write(BFSList[i]);
-
-            var path = graph.Dijkstra(a, f);
-            ;
-
+            Console.WriteLine(hello);
         }
     }
 }

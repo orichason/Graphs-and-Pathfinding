@@ -5,7 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Graphs
+namespace Graphs.Comparers
 {
     public class AStarComparer : IComparer<Vertex<Vector2>>
     {
